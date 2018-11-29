@@ -1,4 +1,4 @@
-<img src="Logo AI Square Connect.png" align="right" width="50%"/>
+<img src="Logo AI Square Connect.png" align="right" width="30%"/>
 
 # Code and data for the Optimal Coordinate Ascent method
 
