@@ -13,8 +13,11 @@ from BCA import BCAFunction
 
 #%%
 
+'''
+    Generic OCAMethod for feature selection
+'''
 class OCAMethod:
-    def __init__(self, data, n_min = 3, verbose = False, reload_feature_importance = False, 
+    def __init__(self, data, n_min = 3, verbose = True, reload_feature_importance = False, 
                  method = 'XGB' ):
         self.data = data
         self.n_min = n_min
@@ -138,14 +141,17 @@ class OCAMethod:
             
             iteration += 1
             self.X = Xnew
-            self.list_score = list_score
+            self.list_
+            score = list_score
             
+    ''' This is the second step of the method
+    '''
     def __binary_coordinate_ascent(self):
         df2 = pd.read_csv('features_importance_' + self.method + '.csv')
         list_col = list(df2['Variable'])
         step_1_solution = get_k_j_best_list(list_col, self.X[0], 'Block1', self.X)
         tol = 1e-10
-        a, b, c, d_x, d_y, l_step2 = BCAFunction(self.data.df, tol, step_1_solution, self.list_score)
+        a, b, c, d_x, d_y, l_step2 = BCAFunction(self.data.df, tol, step_1_solution, self.list_score, self.verbose)
         self.selected_features = c
         self.list_score = l_step2
         
@@ -164,6 +170,3 @@ class OCAMethod:
         # step 2: full coordinate ascent binary optimization
         self.__binary_coordinate_ascent()
         return self.select_features, self.list_score
-        
-        
-

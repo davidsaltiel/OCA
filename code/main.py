@@ -11,8 +11,12 @@ from RFE import RFEMethod
 from BCA import BCAMethod
 from graphics import create_graphic_for_method, create_figure2, create_figure3
 
+''' This is the main function
+    It calls all the 3 features selection
+    method and compares them
+'''
 
-# get the argument for our class
+# reads the data
 data = DataLoader(dataset_name = 'trade_selection', extension = 'csv')
 data.clean_data()
 

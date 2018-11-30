@@ -5,10 +5,9 @@ Created on Thu Nov 29 15:08:44 2018
 @author: david.saltiel
 """
 
-#%%
 '''
-
 Binary coordinate ascent algorithm :
+The algorithm works as follows:
 we represent the N features by a vector in x in (0,1)^n 
 x(i) = 1 -> features i in the model 
 '''
@@ -20,13 +19,19 @@ warnings.filterwarnings("ignore")
 from functions import score, selec_feat
 
 #%%
+''' This is a generic function
+    for BCA, given a tolerance tol
+    a list of features to treat
+    and a list of score
 
-def BCAFunction(df, tol, list_treat, list_score):
-    
+    This function is called both in BCAMethod
+    and in step 2 of OCAMEthod
+'''
+def BCAFunction(df, tol, list_treat, list_score, verbose):
     start = datetime.now()
     step = 0
-    print('step : ', step)
-#    df = treat_data(df)
+    if verbose:
+        print('step : ', step)
     list_treat = list(df.columns.values)
     list_delete = list(set(list(df.columns.values))-set(list_treat))
     	
@@ -63,20 +68,26 @@ def BCAFunction(df, tol, list_treat, list_score):
                     list_score.append(list_score[-1])
         
         y = score(X_opt, df_X_init, df_Y)
-        print('step : ', step)        
-        print('y_opt : ', y_opt)
-        print('y : ', y)
+        if verbose:
+            print('step : ', step)        
+            print('y_opt : ', y_opt)
+            print('y : ', y)
         if abs(y - y_opt)<tol or step > 10 :
             condition = False
         y_opt = y
     list_features = selec_feat(X_opt, df_X_init, False)
-    print('It took : ',datetime.now()-start)
+    if verbose:
+        print('It took : ',datetime.now()-start)
     return X_opt, y_opt, list_features, df_X_init, df_Y, list_score
 
 
+'''
+    Generic BCAMethod for feature selection
+'''
 class BCAMethod:
-    def __init__(self, data, tol =  1e-10):
+    def __init__(self, data, tol =  1e-10, verbose = True):
         self.data = data
+        self.verbose = verbose
         
     ''' 
         select features 
@@ -87,7 +98,7 @@ class BCAMethod:
     '''
     def select_features(self):
         X_opt, y_opt, list_features, df_X_init, df_Y, list_score = \
-            BCAFunction(self.data.df, self.tol, list(self.data.df.columns), [0])
+            BCAFunction(self.data.df, self.tol, list(self.data.df.columns), [0], self.verbose)
         return list_features, list_score
         
 

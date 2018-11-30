@@ -2,6 +2,14 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
+''' This is the code to generate the
+    graphics of the paper
+    Because of time, we temporarily 
+    hard coded some results
+    Need to be revisited
+'''
+
+
 #%%
 '''
     generic function for figure 1 of the paper

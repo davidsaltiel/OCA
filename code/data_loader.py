@@ -3,21 +3,45 @@ from datetime import datetime
 from os.path import dirname, join
 
 
+'''
+    A generic class to load our data
+'''
 class DataLoader(object):
     def __init__(self, dataset_name = 'trade_selection', extension = 'csv'):
         module_path = dirname(__file__)
         short_filename = dataset_name + '.' + extension
         filename = join(module_path, '..', 'data', short_filename)
         self.dataset_name = dataset_name
-        self.df = pd.read_csv(filename, thousands=',')
+        self.extension = extension
         
+        if extension == 'csv':
+            self.df = pd.read_csv(filename, thousands=',')
+        elif extension == 'xlsx:
+            self.df = pd.read_excel(filename, thousands=',')
+        else
+            raise Exception('Unknown extension type')
+        
+
+    ''' A simple function to get the date time from
+        the datetime input
+    '''
     def __convert(self, u):
-        u=datetime.strptime(u, '%d/%m/%Y %H:%M').strftime('%H%M%S')
+        if extension == 'csv':
+            u=u.strftime('%Y-%m-%d %H:%M:%S')
+            u=datetime.strptime(u, '%d/%m/%Y %H:%M').strftime('%H%M%S')
+        elif extension == 'xlsx:
+            u=datetime.strptime(u, '%d/%m/%Y %H:%M').strftime('%H%M%S')
+        else
+            raise Exception('Unknown extension type')
         z = int(u)
         return z
+            
         
 
-
+    ''' clean data 
+        removes zero and some useless columns
+        data specific
+    '''
     def clean_data(self, threshold = -160):
         # Features_treatment :
         list_rows_to_delete = []

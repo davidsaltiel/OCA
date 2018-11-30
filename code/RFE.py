@@ -5,7 +5,9 @@ Created on Mon Nov 19 13:58:55 2018
 @author: david.saltiel
 """
 
-
+''' 
+    All the import for this file
+'''
 import warnings
 warnings.filterwarnings("ignore")
 from sklearn.feature_selection import RFE
@@ -14,8 +16,15 @@ from functions import compute_accuracy_score
 import pickle
 
 #%%
-
+'''
+    Generic RFEMEthod for feature selection
+'''
 class RFEMethod:
+    '''
+        data an objec that contains a dataframe contained in data.df 
+        the method uses the RFE method from sklearn
+        to compute RFE for the data
+    '''
     def __init__(self, data, verbose = False):
         self.data = data
         self.verbose = verbose
@@ -48,6 +57,8 @@ class RFEMethod:
     '''
         loop over all features between nMin
         and nMax and generate the corresponding score
+        if save_pickle == True, we also save as 
+        a pickle the result
     '''
     def save_all_score(self, nMin = 1, nMax = 45, save_pickle = False):
         dic_score_RFE ={}
@@ -59,8 +70,6 @@ class RFEMethod:
         if save_pickle:
             pickle.dump( dic_score_RFE, open( "dic_score_RFE_v2.p", "wb" ) )
         return dic_score_RFE
-
-
 
     ''' 
         select features 

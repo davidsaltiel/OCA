@@ -18,6 +18,10 @@ from sklearn.model_selection import RandomizedSearchCV
 from xgboost import XGBClassifier
 
 #%%
+'''
+    A generic file to contain various basic functions
+    for our feature selection
+'''
 
 
 '''
@@ -49,8 +53,6 @@ def compute_accuracy_score(X, Y):
     OPT.fit(x_train , y_train)
     model = OPT.best_estimator_
     return model.score(x_test,y_test)
-
-
 
 def selec_feat(binary_list, df, drop) :
     l_drop = []
@@ -262,12 +264,6 @@ def analysis(df, j, other_arguments, algo) :
     return model.score(x_test,y_test)
 
 
-
-
-
-
-
-
 #################################################################
 ''' returns from the long key:"F_Close Algo Bars_0"
           the short key = "F_Close Algo Bars"
@@ -278,16 +274,6 @@ def get_short_key_from_long_key( long_key):
 
 
 #################################################################
-
-def convert(u):
-    u=u.strftime('%Y-%m-%d %H:%M:%S')
-    u=datetime.strptime(u, '%Y-%m-%d %H:%M:%S').strftime('%H%M%S')
-    z = int(u)
-    return z
-
-#################################################################
-
-
 def get_k_best_features(list_col, k):
     best_features_keys = {'key': 1}
     list_to_keep = []
@@ -302,9 +288,6 @@ def get_k_best_features(list_col, k):
     list_to_keep.extend(['Label'])
 
     return list_to_keep
-
-
-
 
 def get_k_j_best_list(list_col, j, var, Xold) :
     
