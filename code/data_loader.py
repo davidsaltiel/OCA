@@ -16,9 +16,9 @@ class DataLoader(object):
         
         if extension == 'csv':
             self.df = pd.read_csv(filename, thousands=',')
-        elif extension == 'xlsx:
+        elif extension == 'xlsx':
             self.df = pd.read_excel(filename, thousands=',')
-        else
+        else:
             raise Exception('Unknown extension type')
         
 
@@ -26,12 +26,12 @@ class DataLoader(object):
         the datetime input
     '''
     def __convert(self, u):
-        if extension == 'csv':
+        if self.extension == 'csv':
+            u=datetime.strptime(u, '%d/%m/%Y %H:%M').strftime('%H%M%S')
+        elif self.extension == 'xlsx':
             u=u.strftime('%Y-%m-%d %H:%M:%S')
             u=datetime.strptime(u, '%d/%m/%Y %H:%M').strftime('%H%M%S')
-        elif extension == 'xlsx:
-            u=datetime.strptime(u, '%d/%m/%Y %H:%M').strftime('%H%M%S')
-        else
+        else:
             raise Exception('Unknown extension type')
         z = int(u)
         return z

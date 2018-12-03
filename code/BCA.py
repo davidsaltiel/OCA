@@ -8,7 +8,7 @@ Created on Thu Nov 29 15:08:44 2018
 '''
 Binary coordinate ascent algorithm :
 The algorithm works as follows:
-we represent the N features by a vector in x in (0,1)^n 
+we represent the N features by a vector x in (0,1)^n 
 x(i) = 1 -> features i in the model 
 '''
 
@@ -55,7 +55,7 @@ def BCAFunction(df, tol, list_treat, list_score, verbose):
             score_X_opt = score(X_opt, df_X_init, df_Y)
             if  score_X >= score_X_opt :
                 if score_X > list_score[-1] :
-                    print('score ',score(X, df_X_init, df_Y))
+                    print('score : ', score(X, df_X_init, df_Y))
                     list_score.append(score_X)
                 else :
                     list_score.append(list_score[-1])
@@ -69,9 +69,7 @@ def BCAFunction(df, tol, list_treat, list_score, verbose):
         
         y = score(X_opt, df_X_init, df_Y)
         if verbose:
-            print('step : ', step)        
-            print('y_opt : ', y_opt)
-            print('y : ', y)
+            print('step : {0}\ny_opt : {1}\ny :{2}'.format(step, y_opt, y))
         if abs(y - y_opt)<tol or step > 10 :
             condition = False
         y_opt = y
@@ -79,15 +77,19 @@ def BCAFunction(df, tol, list_treat, list_score, verbose):
     if verbose:
         print('It took : ',datetime.now()-start)
     return X_opt, y_opt, list_features, df_X_init, df_Y, list_score
+   
 
 
 '''
     Generic BCAMethod for feature selection
 '''
 class BCAMethod:
-    def __init__(self, data, tol =  1e-10, verbose = True):
-        self.data = data
+    def __init__(self, df, tol =  1e-10, verbose = True):
+        self.df = df
         self.verbose = verbose
+        self.tol = tol
+        
+        
         
     ''' 
         select features 
@@ -98,7 +100,10 @@ class BCAMethod:
     '''
     def select_features(self):
         X_opt, y_opt, list_features, df_X_init, df_Y, list_score = \
-            BCAFunction(self.data.df, self.tol, list(self.data.df.columns), [0], self.verbose)
-        return list_features, list_score
+            BCAFunction(self.df, self.tol, list(self.df.columns), [0], self.verbose)
+        self.list_score = list_score
+        self.selected_features = list_features
+        return self.selected_features, self.list_score        
+        
         
 

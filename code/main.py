@@ -15,35 +15,34 @@ from graphics import create_graphic_for_method, create_figure2, create_figure3
     It calls all the 3 features selection
     method and compares them
 '''
-
-# reads the data
+#%% reads the data
 data = DataLoader(dataset_name = 'trade_selection', extension = 'csv')
 data.clean_data()
 
-# OCA method
-oca_method = OCAMethod(data, n_min=3, verbose=True)
+#%% OCA method
+oca_method = OCAMethod(data.df.iloc[:15,:], n_min=3, verbose = True)
 oca_method.select_features()
 
-# RFE method
-rfe_method = RFEMethod(data)
+#%% RFE method
+rfe_method = RFEMethod(data.df.iloc[:20,:], verbose = True)
 rfe_method.select_features()
-ref_dictionary = rfe_method.save_all_score(verbose = False)
+rfe_dictionary = rfe_method.save_all_score()
 
-# BCA method
-bca_method = BCAMethod(data.df)
+#%% BCA method
+bca_method = BCAMethod(data.df.iloc[:15,:], verbose = True)
 bca_method.select_features()
 
 
-# figure 1 combines oca and bca convergence graphics created below
+#%% figure 1 combines oca and bca convergence graphics created below
 # graphic for oca convergence
 create_graphic_for_method(oca_method, 'Convergence for OCA', 'OCAConvergence')
 # graphic for bca convergence
 create_graphic_for_method(bca_method, 'Convergence for BCA', 'BCAConvergence')
 
-# graphic for rfe comparison figure 2 of the paper
-create_figure2(ref_dictionary)
+#%% graphic for rfe comparison figure 2 of the paper
+create_figure2(rfe_dictionary, oca_method, bca_method, data.df)
 
-# graphic for figure 3 of the paper
-create_figure3(ref_dictionary)
+#%% graphic for figure 3 of the paper
+create_figure3(rfe_dictionary, oca_method, data.df)
 
 

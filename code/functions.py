@@ -304,12 +304,10 @@ def get_k_j_best_list(list_col, j, var, Xold) :
     # found the first key that can vary    
     short_key_visited  = [ get_short_key_from_long_key(list_col[0]) ]
 
-
     for feature in list_col:
         short_key = get_short_key_from_long_key(feature)
        
         if short_key not in short_key_visited and short_key not in best_features_keys :
-
             short_key_visited.append(short_key)
               
         if short_key not in best_features_keys:
@@ -323,12 +321,8 @@ def get_k_j_best_list(list_col, j, var, Xold) :
             if best_features_keys[short_key] < Xold[list_var.index(short_key)]: 
                 best_features_keys[short_key ] += 1
                 list_to_keep.append(feature)
-                
         
     list_to_keep.extend(['Label'])
-
-        
-    print('length ',len(list_to_keep))
     return list_to_keep
 
 #################################################################

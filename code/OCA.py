@@ -17,9 +17,9 @@ from BCA import BCAFunction
     Generic OCAMethod for feature selection
 '''
 class OCAMethod:
-    def __init__(self, data, n_min = 3, verbose = True, reload_feature_importance = False, 
+    def __init__(self, df, n_min = 3, verbose = True, reload_feature_importance = False, 
                  method = 'XGB' ):
-        self.data = data
+        self.df = df
         self.n_min = n_min
         self.verbose = verbose
         self.reload_feature_importance = reload_feature_importance
@@ -33,7 +33,7 @@ class OCAMethod:
         if self.reload_feature_importance == False:
             if self.verbose:
                 print('Computation of features importance to start the greedy algorithm :')    
-            compute_feature_importance(self.data.df, self.method )
+            compute_feature_importance(self.df, self.method )
         else :
             if self.verbose:
                 print('We use the previous computation of features importance to start the greedy algorithm :')
@@ -54,42 +54,31 @@ class OCAMethod:
         
         # computation of the vector X0
         if self.verbose:
-            print('##')
-            print('Initialization')
-            print('##')
-        Xold, best_k, score_test_old, l_scores = compute_k_best(self.data.df, self.n_min, index_best_k, self.method)
+            print('##\nInitialization\n##')
+        Xold, best_k, score_test_old, l_scores = compute_k_best(self.df, self.n_min, index_best_k, self.method)
         list_score.extend(l_scores)
         if self.verbose:
-            print(Xold) 
-            print('Score ', score_test_old)
+            print('Xold : {0}\nScore : {1}'.format( Xold, score_test_old) )
         
         X_init =  Xold.copy()
         condition = True
-        
             
         while condition :
             index_best_k = 1
             
             if self.verbose:
-                print('##')
-                print('Iteration : ', iteration)
-                print('Index : ', index)
-                print('##')
-                print('xold ',Xold) 
+                print( '##\nIteration : {0}\nIndex : {1}\n##\nXold :{2}'.format(iteration, index, Xold))
                 
             # To repeat the computation over the vector X
             if index == len(list_var) :
                 index =0
                 loop += 1
                 if self.verbose:
-                    print('')
-                    print("We restart the loop over the vector")
-                    print('Index : ', index)
-                    print('')
+                    print('We restart the loop over the vector\nIndex : {0}\n'.format(index))
                 
             if loop >0 :
                 count +=1
-            l_test_j, l_scores_compute = compute_j_best(self.data.df, self.n_min, index, best_k, Xold,
+            l_test_j, l_scores_compute = compute_j_best(self.df, self.n_min, index, best_k, Xold,
                                                    self.method, list_score)
             list_score = l_scores_compute
             best_j = np.argmax(l_test_j) + index_best_k
@@ -100,39 +89,26 @@ class OCAMethod:
             Xnew[index] = best_j
             
             if self.verbose:
-                print(Xnew)
-                print('Score : ',score_test_new)
+                print('Xnew : {0}\nScore : {1}'.format(Xnew, score_test_new))
             
             while Xnew == X_init and iteration < min_iter and loop != 0 :
                 index_best_k += 1
                 iteration += 1
                 if self.verbose:
-                    print('')
-                    print('Local minimum :')
-                    print("We need to take the ",index_best_k, " best score")
-                    print('')
-                    
-                    print('##')
-                    print('Iteration : ', iteration)
-                    
-                    print('##')
+                    print('\nLocal minimum :\nWe need to take the {0} best score'.format(index_best_k))
+                    print('##\nIteration : {0}\n##'.format(iteration))
                 
                 
                 best_j = np.argmax(l_test_j) + index_best_k 
                 score_new = np.sort(l_test_j)[-index_best_k]
-                list_score.extend(score_new)
+                list_score.extend([score_new])
                 Xnew[index] = best_j
                 if self.verbose:
-                    print(Xnew)
-                    print('Score : ',score_new)
+                    print('Xnew : {0}\nScore : {1}'.format(Xnew, score_new))
                 
             condition = (iteration < max_iter and Xnew !=Xold and
                          abs(score_test_old - score_test_new)>= tol) or count < len(list_var)
             if self.verbose:
-                print('Xnew !=Xold',Xnew !=Xold) 
-                print('loop', loop)
-                print('abs(score_test_old - score_test_new)>= tol)',abs(score_test_old - score_test_new)>= tol)  
-                print('count < len(list_var)',count < len(list_var))             
                 print(condition)    
             Xold = Xnew.copy()
             score_test_old = score_test_new
@@ -141,8 +117,7 @@ class OCAMethod:
             
             iteration += 1
             self.X = Xnew
-            self.list_
-            score = list_score
+            self.list_score = list_score
             
     ''' This is the second step of the method
     '''
@@ -151,7 +126,7 @@ class OCAMethod:
         list_col = list(df2['Variable'])
         step_1_solution = get_k_j_best_list(list_col, self.X[0], 'Block1', self.X)
         tol = 1e-10
-        a, b, c, d_x, d_y, l_step2 = BCAFunction(self.data.df, tol, step_1_solution, self.list_score, self.verbose)
+        a, b, c, d_x, d_y, l_step2 = BCAFunction(self.df, tol, step_1_solution, self.list_score, self.verbose)
         self.selected_features = c
         self.list_score = l_step2
         
@@ -169,4 +144,4 @@ class OCAMethod:
         
         # step 2: full coordinate ascent binary optimization
         self.__binary_coordinate_ascent()
-        return self.select_features, self.list_score
+        return self.selected_features, self.list_score

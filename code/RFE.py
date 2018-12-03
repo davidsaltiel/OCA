@@ -21,12 +21,12 @@ import pickle
 '''
 class RFEMethod:
     '''
-        data an objec that contains a dataframe contained in data.df 
+        df an objec that contains a dataframe contained in df.df 
         the method uses the RFE method from sklearn
-        to compute RFE for the data
+        to compute RFE for the df
     '''
-    def __init__(self, data, verbose = False):
-        self.data = data
+    def __init__(self, df, verbose = False):
+        self.df = df
         self.verbose = verbose
 
     '''
@@ -34,11 +34,11 @@ class RFEMethod:
         using the RFE method from sklearn
     '''
     def get_score_and_features(self, n_features):
-        features = list(self.data.df.columns.values)
+        features = list(self.df.columns.values)
         features.remove('Label')
         
-        df_X = self.data.df[features]
-        df_Y = self.data.df['Label']
+        df_X = self.df[features]
+        df_Y = self.df['Label']
         estimator = RandomForestClassifier(random_state=0)
         
         selector = RFE(estimator, n_features, step=1)
@@ -50,9 +50,11 @@ class RFEMethod:
         list_feat = list(df_X.columns[list_to_keep])
         list_delete = list(set(list(df_X.columns.values))-set(df_X.columns[list_to_keep]))
         df_X = df_X.drop(list_delete  ,axis=1)  
-        score = compute_accuracy_score(df_X)
-        return list_feat, score
-
+        score = compute_accuracy_score(df_X, df_Y)
+        self.selected_features = list_feat
+        self.list_score = score
+        return self.selected_features, self.list_score
+        
     
     '''
         loop over all features between nMin
@@ -66,7 +68,7 @@ class RFEMethod:
             list_feat, score = self.get_score_and_features(n_features)
             dic_score_RFE[n_features] = [list_feat, score]
             if self.verbose :
-                print(n_features, score)
+                print('n_features : {0} score : {1}'.format(n_features, score))
         if save_pickle:
             pickle.dump( dic_score_RFE, open( "dic_score_RFE_v2.p", "wb" ) )
         return dic_score_RFE
