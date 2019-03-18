@@ -18,12 +18,13 @@ from BCA import BCAFunction
 '''
 class OCAMethod:
     def __init__(self, df, n_min = 3, verbose = True, reload_feature_importance = False, 
-                 method = 'XGB' ):
+                 method = 'XGB' , split = 'temporal'):
         self.df = df
         self.n_min = n_min
         self.verbose = verbose
         self.reload_feature_importance = reload_feature_importance
         self.method = method
+        self.split = split
 
     '''
         First loop of the OCA method
@@ -33,7 +34,7 @@ class OCAMethod:
         if self.reload_feature_importance == False:
             if self.verbose:
                 print('Computation of features importance to start the greedy algorithm :')    
-            compute_feature_importance(self.df, self.method )
+            compute_feature_importance(self.df, self.method ,self.split)
         else :
             if self.verbose:
                 print('We use the previous computation of features importance to start the greedy algorithm :')
@@ -55,7 +56,7 @@ class OCAMethod:
         # computation of the vector X0
         if self.verbose:
             print('##\nInitialization\n##')
-        Xold, best_k, score_test_old, l_scores = compute_k_best(self.df, self.n_min, index_best_k, self.method)
+        Xold, best_k, score_test_old, l_scores = compute_k_best(self.df, self.n_min, index_best_k, self.method, self.split)
         list_score.extend(l_scores)
         if self.verbose:
             print('Xold : {0}\nScore : {1}'.format( Xold, score_test_old) )
@@ -79,7 +80,7 @@ class OCAMethod:
             if loop >0 :
                 count +=1
             l_test_j, l_scores_compute = compute_j_best(self.df, self.n_min, index, best_k, Xold,
-                                                   self.method, list_score)
+                                                   self.method, list_score,self.split)
             list_score = l_scores_compute
             best_j = np.argmax(l_test_j) + index_best_k
             if self.verbose:
@@ -100,11 +101,10 @@ class OCAMethod:
                 
                 
                 best_j = np.argmax(l_test_j) + index_best_k 
-                score_new = np.sort(l_test_j)[-index_best_k]
-                list_score.extend([score_new])
+#                score_new = np.sort(l_test_j)[-index_best_k]
+#                list_score.extend([score_new])
                 Xnew[index] = best_j
-                if self.verbose:
-                    print('Xnew : {0}\nScore : {1}'.format(Xnew, score_new))
+               
                 
             condition = (iteration < max_iter and Xnew !=Xold and
                          abs(score_test_old - score_test_new)>= tol) or count < len(list_var)
@@ -126,7 +126,8 @@ class OCAMethod:
         list_col = list(df2['Variable'])
         step_1_solution = get_k_j_best_list(list_col, self.X[0], 'Block1', self.X)
         tol = 1e-10
-        a, b, c, d_x, d_y, l_step2 = BCAFunction(self.df, tol, step_1_solution, self.list_score, self.verbose)
+        a, b, c, d_x, d_y, l_step2 = BCAFunction(self.df, tol, step_1_solution,
+                                                 self.list_score, self.verbose,self.split)
         self.selected_features = c
         self.list_score = l_step2
         

@@ -27,7 +27,7 @@ from functions import score, selec_feat
     This function is called both in BCAMethod
     and in step 2 of OCAMEthod
 '''
-def BCAFunction(df, tol, list_treat, list_score, verbose):
+def BCAFunction(df, tol, list_treat, list_score, verbose, split):
     start = datetime.now()
     step = 0
     if verbose:
@@ -45,17 +45,17 @@ def BCAFunction(df, tol, list_treat, list_score, verbose):
     condition = True
     X_opt = np.zeros(N)
 
-    y_opt = score(X_opt, df_X_init, df_Y)
+    y_opt = score(X_opt, df_X_init, df_Y, split)
     while condition :
         step +=1
         for i in range(N):            
             X = X_opt.copy()
             X[i] = int(not X_opt[i])  
-            score_X = score(X, df_X_init, df_Y) 
-            score_X_opt = score(X_opt, df_X_init, df_Y)
+            score_X = score(X, df_X_init, df_Y, split) 
+            score_X_opt = score(X_opt, df_X_init, df_Y, split)
             if  score_X >= score_X_opt :
                 if score_X > list_score[-1] :
-                    print('score : ', score(X, df_X_init, df_Y))
+                    print('score : ', score(X, df_X_init, df_Y, split))
                     list_score.append(score_X)
                 else :
                     list_score.append(list_score[-1])
@@ -67,7 +67,7 @@ def BCAFunction(df, tol, list_treat, list_score, verbose):
                 else :
                     list_score.append(list_score[-1])
         
-        y = score(X_opt, df_X_init, df_Y)
+        y = score(X_opt, df_X_init, df_Y, split)
         if verbose:
             print('step : {0}\ny_opt : {1}\ny :{2}'.format(step, y_opt, y))
         if abs(y - y_opt)<tol or step > 10 :
@@ -84,12 +84,11 @@ def BCAFunction(df, tol, list_treat, list_score, verbose):
     Generic BCAMethod for feature selection
 '''
 class BCAMethod:
-    def __init__(self, df, tol =  1e-10, verbose = True):
+    def __init__(self, df, tol =  1e-10, verbose = True, split = 'temporal'):
         self.df = df
         self.verbose = verbose
         self.tol = tol
-        
-        
+        self.split = split
         
     ''' 
         select features 
@@ -100,7 +99,8 @@ class BCAMethod:
     '''
     def select_features(self):
         X_opt, y_opt, list_features, df_X_init, df_Y, list_score = \
-            BCAFunction(self.df, self.tol, list(self.df.columns), [0], self.verbose)
+            BCAFunction(self.df, self.tol, list(self.df.columns), [0],
+                        self.verbose, self.split)
         self.list_score = list_score
         self.selected_features = list_features
         return self.selected_features, self.list_score        

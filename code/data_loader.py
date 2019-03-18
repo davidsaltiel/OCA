@@ -15,7 +15,10 @@ class DataLoader(object):
         self.extension = extension
         
         if extension == 'csv':
-            self.df = pd.read_csv(filename, thousands=',')
+            try :
+                self.df = pd.read_csv(filename, thousands=',')
+            except : 
+                self.df = pd.read_csv(filename, thousands=',',encoding='latin-1')
         elif extension == 'xlsx':
             self.df = pd.read_excel(filename, thousands=',')
         else:
@@ -49,6 +52,7 @@ class DataLoader(object):
             if self.df.iloc[i,1:].sum() == 0:
                 list_rows_to_delete.append(i)
         self.df = self.df.drop(list_rows_to_delete,axis=0)
+        self.df = self.df.reset_index(drop=True)
         
         if self.dataset_name == 'trade_selection':
             self.df['Label'] = (self.df['Result']>threshold)*1

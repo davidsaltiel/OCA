@@ -27,11 +27,18 @@ from xgboost import XGBClassifier
 '''
     compute accuracy score
 '''
-def compute_accuracy_score(X, Y):
+def compute_accuracy_score(X, Y, split):
     random.seed(0)
 
-    x_train, x_test, y_train, y_test = train_test_split(X, Y, test_size=0.33,
+    if split == 'temporal' :
+        split_data = int(0.67*X.shape[0])
+        x_train, x_test, y_train, y_test = X.iloc[:split_data,:], X.iloc[split_data:,:],\
+                                            Y.iloc[:split_data], Y.iloc[split_data:]
+    else :
+        
+        x_train, x_test, y_train, y_test = train_test_split(X, Y, test_size=0.33,
                                                         random_state = 0)
+    
 
     clf_xgb = XGBClassifier(random_state=0)
     dic_param = { 'n_estimators':[100, 150, 200, 250] , 
@@ -71,16 +78,16 @@ def selec_feat(binary_list, df, drop) :
 
 
 
-def score(X, df_X, df_Y):
+def score(X, df_X, df_Y, split):
     if X.sum() != 0:
-        return compute_accuracy_score(selec_feat(X, df_X, True), df_Y)
+        return compute_accuracy_score(selec_feat(X, df_X, True), df_Y, split)
     else :
         return 0
 
 #################################################################
 
 
-def compute_feature_importance(df, algo):
+def compute_feature_importance(df, algo, split):
     
     random.seed(0)
     features_ = list(df.columns.values)
@@ -89,7 +96,13 @@ def compute_feature_importance(df, algo):
     X = df[features_]
     Y = df['Label']
     
-    x_train, x_test, y_train, y_test = train_test_split(X, Y, test_size=0.33,
+    if split == 'temporal' :
+        split_data = int(0.67*df.shape[0])
+        x_train, x_test, y_train, y_test = X.iloc[:split_data,:], X.iloc[split_data:,:],\
+                                            Y.iloc[:split_data], Y.iloc[split_data:]
+    else :
+        
+        x_train, x_test, y_train, y_test = train_test_split(X, Y, test_size=0.33,
                                                         random_state = 0)
     if algo == 'RF' :
         
@@ -163,7 +176,7 @@ def compute_feature_importance(df, algo):
 
 #################################################################
 
-def analysis(df, j, other_arguments, algo) :
+def analysis(df, j, other_arguments, algo, split) :
     
 
     if other_arguments is not None and len(other_arguments) == 2:
@@ -203,7 +216,13 @@ def analysis(df, j, other_arguments, algo) :
     X = df[features_]
     Y = df['Label']
     
-    x_train, x_test, y_train, y_test = train_test_split(X, Y, test_size=0.33,
+    if split =='temporal' :
+        split_data = int(0.67*df.shape[0])
+        x_train, x_test, y_train, y_test = X.iloc[:split_data,:], X.iloc[split_data:,:],\
+                                            Y.iloc[:split_data], Y.iloc[split_data:]
+    else :
+        
+        x_train, x_test, y_train, y_test = train_test_split(X, Y, test_size=0.33,
                                                         random_state = 0)
     
     if algo == 'RF' :
@@ -329,7 +348,7 @@ def get_k_j_best_list(list_col, j, var, Xold) :
 
 
 
-def compute_k_best(df, n, index_best_k, algo):
+def compute_k_best(df, n, index_best_k, algo, split):
     
     '''
     Initialisation :
@@ -353,7 +372,7 @@ def compute_k_best(df, n, index_best_k, algo):
     l_scores = []
     score_step = [0]
     for k in range(1,n) :       
-        sc_test =  analysis(df, k, None, algo)
+        sc_test =  analysis(df, k, None, algo, split)
         l_scores.append(sc_test)
         if sc_test < score_step[-1] :
             score_step.append(score_step[-1])
@@ -374,7 +393,7 @@ def compute_k_best(df, n, index_best_k, algo):
 Step 1 :
 '''
 
-def compute_j_best(df, n, index, k_max, Xold, algo, score_step) :
+def compute_j_best(df, n, index, k_max, Xold, algo, score_step, split) :
     
     list_var = ['Block1', 
                 'Block2',
@@ -389,7 +408,7 @@ def compute_j_best(df, n, index, k_max, Xold, algo, score_step) :
     l_scores = []
     for j in range(1,n):
   
-        sc_test_j = analysis(df, j, [var, Xold], algo)
+        sc_test_j = analysis(df, j, [var, Xold], algo, split)
         l_scores.append(sc_test_j)
 
         if sc_test_j < score_step[-1] :
