@@ -1,7 +1,7 @@
 import pandas as pd
 from datetime import datetime
 from os.path import dirname, join
-
+import re
 
 '''
     A generic class to load our data
@@ -39,7 +39,25 @@ class DataLoader(object):
         z = int(u)
         return z
             
+    '''
+    Get the list of the block variables
+    '''        
+    def get_list_var_block(self):
+        keys = self.df.columns
+        block_variables_tmp = []   
+        block_variables = []
+        for key in keys:
+            result = re.findall("([A-z_ €\-\(\),0-9]+)_[0-9]+", key)
+            if len(result) == 1:
+                if result[0] not in block_variables_tmp:
+                    m = 1
+                    block_variables_tmp.append(result[0]) 
+                else :
+                    m += 1
+                    if m == 2 :
+                        block_variables.append(result[0])
         
+        return block_variables    
 
     ''' clean data 
         removes zero and some useless columns
@@ -69,6 +87,6 @@ class DataLoader(object):
             self.df['mean_Block6_0'] = self.df.iloc[:,112:132].mean(axis=1)
 
             # Drop columns :
-            list_cols_to_delete = ['Result']
-            self.df = self.df.drop(list_cols_to_delete  ,axis=1)
-
+#            list_cols_to_delete = ['Result']
+#            self.df = self.df.drop(list_cols_to_delete  ,axis=1)
+            return self.df

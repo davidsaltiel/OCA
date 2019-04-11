@@ -35,14 +35,20 @@ class RFEMethod:
         get score and feature for a given number of features
         using the RFE method from sklearn
     '''
-    def get_score_and_features(self, n_features):
+    def get_score_and_features(self, n_features, split = 'temporal'):
         features = list(self.df.columns.values)
         features.remove('Label')
         
         df_X = self.df[features]
         df_Y = self.df['Label']
         estimator = XGBClassifier(random_state=0)
-        x_train, x_test, y_train, y_test = train_test_split(df_X, df_Y, test_size=0.33,
+        
+        if split == 'temporal' :
+            split_data = int(0.67*df_X.shape[0])
+            x_train, x_test, y_train, y_test = df_X.iloc[:split_data,:], df_X.iloc[split_data:,:],\
+                                            df_Y.iloc[:split_data], df_Y.iloc[split_data:]
+        else :
+            x_train, x_test, y_train, y_test = train_test_split(df_X, df_Y, test_size=0.33,
                                                         random_state = 0)
         
         selector = RFE(estimator, n_features, step=1)

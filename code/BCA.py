@@ -28,11 +28,16 @@ from functions import score, selec_feat
     and in step 2 of OCAMEthod
 '''
 def BCAFunction(df, tol, list_treat, list_score, verbose, split):
+    print('----------------------')
+    print('')
+    print('BCA Method')
+    print('')
+    print('----------------------')
     start = datetime.now()
     step = 0
     if verbose:
         print('step : ', step)
-    list_treat = list(df.columns.values)
+#    list_treat = list(df.columns.values)
     list_delete = list(set(list(df.columns.values))-set(list_treat))
     	
     df = df.drop(list_delete  ,axis=1)

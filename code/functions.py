@@ -41,25 +41,28 @@ def compute_accuracy_score(X, Y, split):
     
 
     clf_xgb = XGBClassifier(random_state=0)
-    dic_param = { 'n_estimators':[100, 150, 200, 250] , 
-          'max_depth' : [3, 4, 5, 6, 7, 9, 10,11,12] ,
-          'learning_rate' : [0.01, 0.02, 0.05, 0.07, 0.1] , 
-          'gamma' : [ 0.01, 0.05, 0.1, 0.5, 0.7, 1, 10] , 
-          'colsample_bylevel' : [1, 0.7],
-          'colsample_bytree' : [1, 0.7],
-          'subsample' : [1, 0.7],
-          'reg_lambda' : [ 0.01, 0.05, 0.1, 0.5, 0.7, 1, 5, 8, 10],
-          'min_child_weight' : [1,2,3,5,6]
-					}
+#    dic_param = { 'n_estimators':[100, 150, 200, 250] , 
+#          'max_depth' : [3, 4, 5, 6, 7, 9, 10,11,12] ,
+#          'learning_rate' : [0.01, 0.02, 0.05, 0.07, 0.1] , 
+#          'gamma' : [ 0.01, 0.05, 0.1, 0.5, 0.7, 1, 10] , 
+#          'colsample_bylevel' : [1, 0.7],
+#          'colsample_bytree' : [1, 0.7],
+#          'subsample' : [1, 0.7],
+#          'reg_lambda' : [ 0.01, 0.05, 0.1, 0.5, 0.7, 1, 5, 8, 10],
+#          'min_child_weight' : [1,2,3,5,6]
+#					}
+#
+#    OPT = RandomizedSearchCV( clf_xgb, 
+#              param_distributions = dic_param, 
+#                                cv = 3 , scoring = 'roc_auc',
+#                                     n_iter = 60, n_jobs=-1,
+#                                     random_state = 0 )
+#    OPT.fit(x_train , y_train)
+#    model = OPT.best_estimator_
+#    return model.score(x_test,y_test)
+    clf_xgb = clf_xgb.fit(x_train , y_train)
+    return clf_xgb.score(x_test,y_test)
 
-    OPT = RandomizedSearchCV( clf_xgb, 
-              param_distributions = dic_param, 
-                                cv = 3 , scoring = 'roc_auc',
-                                     n_iter = 60, n_jobs=-1,
-                                     random_state = 0 )
-    OPT.fit(x_train , y_train)
-    model = OPT.best_estimator_
-    return model.score(x_test,y_test)
 
 def selec_feat(binary_list, df, drop) :
     l_drop = []
@@ -139,27 +142,29 @@ def compute_feature_importance(df, algo, split):
             index=False,encoding='latin-1')
     else :
         clf_xgb = XGBClassifier(random_state=0)
-        dic_param = { 'n_estimators':[100, 150, 200, 250] , 
-              'max_depth' : [3, 4, 5, 6, 7, 9, 10,11,12] ,
-              'learning_rate' : [0.01, 0.02, 0.05, 0.07, 0.1] , 
-              'gamma' : [ 0.01, 0.05, 0.1, 0.5, 0.7, 1, 10] , 
-              'colsample_bylevel' : [1, 0.7],
-              'colsample_bytree' : [1, 0.7],
-              'subsample' : [1, 0.7],
-              'reg_lambda' : [ 0.01, 0.05, 0.1, 0.5, 0.7, 1, 5, 8, 10],
-              'min_child_weight' : [1,2,3,5,6]
-					}
+#        dic_param = { 'n_estimators':[100, 150, 200, 250] , 
+#              'max_depth' : [3, 4, 5, 6, 7, 9, 10,11,12] ,
+#              'learning_rate' : [0.01, 0.02, 0.05, 0.07, 0.1] , 
+#              'gamma' : [ 0.01, 0.05, 0.1, 0.5, 0.7, 1, 10] , 
+#              'colsample_bylevel' : [1, 0.7],
+#              'colsample_bytree' : [1, 0.7],
+#              'subsample' : [1, 0.7],
+#              'reg_lambda' : [ 0.01, 0.05, 0.1, 0.5, 0.7, 1, 5, 8, 10],
+#              'min_child_weight' : [1,2,3,5,6]
+#					}
+#        
+#        OPT = RandomizedSearchCV( clf_xgb , 
+#                                  param_distributions = dic_param, 
+#                                                    cv = 3 , scoring = 'roc_auc',
+#                                                         n_iter = 60, n_jobs=-1,
+#                                                         random_state = 0 )
+#        
+#        OPT.fit(x_train , y_train)
+#        
+#        model=OPT.best_estimator_
+#        model.fit(x_train , y_train)
         
-        OPT = RandomizedSearchCV( clf_xgb , 
-                                  param_distributions = dic_param, 
-                                                    cv = 3 , scoring = 'roc_auc',
-                                                         n_iter = 60, n_jobs=-1,
-                                                         random_state = 0 )
-        
-        OPT.fit(x_train , y_train)
-        
-        model=OPT.best_estimator_
-        model.fit(x_train , y_train)
+        model = clf_xgb.fit(x_train , y_train)
         
         feature_importance=pd.DataFrame(model.feature_importances_)
         feature_importance = pd.concat([pd.DataFrame(
@@ -176,7 +181,7 @@ def compute_feature_importance(df, algo, split):
 
 #################################################################
 
-def analysis(df, j, other_arguments, algo, split) :
+def analysis(df, j, other_arguments, algo, split, list_var) :
     
 
     if other_arguments is not None and len(other_arguments) == 2:
@@ -200,7 +205,7 @@ def analysis(df, j, other_arguments, algo, split) :
 
     
     if other_arguments is not None:
-        list_to_keep = get_k_j_best_list(list_col, j, var, Xold)
+        list_to_keep = get_k_j_best_list(list_col, j, var, Xold, list_var)
     else:
         list_to_keep = get_k_best_features(list_col, j) 
     
@@ -252,36 +257,37 @@ def analysis(df, j, other_arguments, algo, split) :
     else :
         clf_xgb = XGBClassifier(random_state=0)
     
-        dic_param = { 'n_estimators':[100, 150, 200, 250] , 
-                  'max_depth' : [3, 4, 5, 6, 7, 9, 10,11,12] ,
-                  'learning_rate' : [0.01, 0.02, 0.05, 0.07, 0.1] , 
-                  'gamma' : [ 0.01, 0.05, 0.1, 0.5, 0.7, 1, 10] , 
-                  'colsample_bylevel' : [1, 0.7],
-                  'colsample_bytree' : [1, 0.7],
-                  'subsample' : [1, 0.7],
-                  'reg_lambda' : [ 0.01, 0.05, 0.1, 0.5, 0.7, 1, 5, 8, 10],
-                  'min_child_weight' : [1,2,3,5,6]
-					}
-    
-        OPT = RandomizedSearchCV( clf_xgb , 
-                              param_distributions = dic_param, 
-                                                cv = 3 , scoring = 'roc_auc',
-                                                     n_iter = 60, n_jobs=-1,
-                                                     random_state = 0 )
-        
-        OPT.fit(x_train , y_train)
-   
-        filename = "XGB_optimization_trace_{0}.txt".format(datetime.now().strftime("%Y-%m-%d %H"))
-        file = open(filename, mode = 'a')
-        file.write("{0}: Xold={1}\n".format(datetime.now().strftime("%Y-%m-%d %H:%M"), Xold) )
-        file.write("Best Params : %s" % str (OPT.best_params_))
-        file.write("\n\n")
-        file.close()
-        
-        
-    model = OPT.best_estimator_
-    return model.score(x_test,y_test)
-
+#        dic_param = { 'n_estimators':[100, 150, 200, 250] , 
+#                  'max_depth' : [3, 4, 5, 6, 7, 9, 10,11,12] ,
+#                  'learning_rate' : [0.01, 0.02, 0.05, 0.07, 0.1] , 
+#                  'gamma' : [ 0.01, 0.05, 0.1, 0.5, 0.7, 1, 10] , 
+#                  'colsample_bylevel' : [1, 0.7],
+#                  'colsample_bytree' : [1, 0.7],
+#                  'subsample' : [1, 0.7],
+#                  'reg_lambda' : [ 0.01, 0.05, 0.1, 0.5, 0.7, 1, 5, 8, 10],
+#                  'min_child_weight' : [1,2,3,5,6]
+#					}
+#    
+#        OPT = RandomizedSearchCV( clf_xgb , 
+#                              param_distributions = dic_param, 
+#                                                cv = 3 , scoring = 'roc_auc',
+#                                                     n_iter = 60, n_jobs=-1,
+#                                                     random_state = 0 )
+#        
+#        OPT.fit(x_train , y_train)
+#   
+#        filename = "XGB_optimization_trace_{0}.txt".format(datetime.now().strftime("%Y-%m-%d %H"))
+#        file = open(filename, mode = 'a')
+#        file.write("{0}: Xold={1}\n".format(datetime.now().strftime("%Y-%m-%d %H:%M"), Xold) )
+#        file.write("Best Params : %s" % str (OPT.best_params_))
+#        file.write("\n\n")
+#        file.close()
+#        
+#        
+#    model = OPT.best_estimator_
+#    return model.score(x_test,y_test)
+    clf_xgb = clf_xgb.fit(x_train , y_train)
+    return clf_xgb.score(x_test,y_test)
 
 #################################################################
 ''' returns from the long key:"F_Close Algo Bars_0"
@@ -308,14 +314,14 @@ def get_k_best_features(list_col, k):
 
     return list_to_keep
 
-def get_k_j_best_list(list_col, j, var, Xold) :
+def get_k_j_best_list(list_col, j, var, Xold, list_var) :
     
-    list_var = ['Block1', 
-                'Block2',
-                'Block3',
-                'Block4',
-                'Block5',
-                'Block6']
+    #list_var = ['Block1', 
+    #            'Block2',
+    #            'Block3',
+    #            'Block4',
+    #            'Block5',
+    #            'Block6']
     
     best_features_keys = {'key': 1}
     list_to_keep = []
@@ -348,18 +354,18 @@ def get_k_j_best_list(list_col, j, var, Xold) :
 
 
 
-def compute_k_best(df, n, index_best_k, algo, split):
+def compute_k_best(df, n, index_best_k, algo, split, list_var):
     
     '''
     Initialisation :
     '''
     
-    list_var = ['Block1', 
-                'Block2',
-                'Block3',
-                'Block4',
-                'Block5',
-                'Block6']
+    #list_var = ['Block1', 
+    #            'Block2',
+    #            'Block3',
+    #            'Block4',
+    #            'Block5',
+    #            'Block6']
     
     
     
@@ -372,7 +378,7 @@ def compute_k_best(df, n, index_best_k, algo, split):
     l_scores = []
     score_step = [0]
     for k in range(1,n) :       
-        sc_test =  analysis(df, k, None, algo, split)
+        sc_test =  analysis(df, k, None, algo, split, list_var)
         l_scores.append(sc_test)
         if sc_test < score_step[-1] :
             score_step.append(score_step[-1])
@@ -393,14 +399,14 @@ def compute_k_best(df, n, index_best_k, algo, split):
 Step 1 :
 '''
 
-def compute_j_best(df, n, index, k_max, Xold, algo, score_step, split) :
+def compute_j_best(df, n, index, k_max, Xold, algo, score_step, split, list_var) :
     
-    list_var = ['Block1', 
-                'Block2',
-                'Block3',
-                'Block4',
-                'Block5',
-                'Block6']
+    #list_var = ['Block1', 
+    #            'Block2',
+    #            'Block3',
+    #            'Block4',
+    #            'Block5',
+    #            'Block6']
     
     var = list_var[index]
     
@@ -408,7 +414,7 @@ def compute_j_best(df, n, index, k_max, Xold, algo, score_step, split) :
     l_scores = []
     for j in range(1,n):
   
-        sc_test_j = analysis(df, j, [var, Xold], algo, split)
+        sc_test_j = analysis(df, j, [var, Xold], algo, split, list_var)
         l_scores.append(sc_test_j)
 
         if sc_test_j < score_step[-1] :

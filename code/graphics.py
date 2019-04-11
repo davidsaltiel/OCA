@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
+from os.path import dirname, join
 
 
 ''' This is the code to generate the
@@ -15,14 +16,17 @@ import numpy as np
     generic function for figure 1 of the paper
 '''
 def create_graphic_for_method(method, title, filename):
+    module_path = dirname(__file__)
+    filename_ = join(module_path,'..', 'output', 'Plot', filename)
     list_score = method.list_score
     fig, ax = plt.subplots()
     ax.plot(np.arange(len(list_score)),list_score,'-', markersize=8)
     ax.set(xlabel='Number of iterations ', ylabel='score',
            title=title)
     ax.grid()
-    plt.legend()
+#    plt.legend()
 #    plt.savefig(filename + '.PNG')
+    plt.savefig(filename_ + '.PNG')
     plt.show()
     
 #%%
@@ -30,6 +34,8 @@ def create_graphic_for_method(method, title, filename):
     function to create figure 2 of the paper
 '''
 def create_figure2(rfe_dictionary, oca_method, bca_method, df):
+    module_path = dirname(__file__)
+    filename = join(module_path,'..', 'output', 'Plot')
     features_oca = oca_method.selected_features
     scores_oca = oca_method.list_score
     features_bca = bca_method.selected_features
@@ -49,7 +55,7 @@ def create_figure2(rfe_dictionary, oca_method, bca_method, df):
            title='Comparison of methods')
     ax.grid()
     plt.legend()
-#    plt.savefig('Comparison_methods.png')
+    plt.savefig(filename+'\\Comparison_methods.png')
     plt.show()
     
 
@@ -59,6 +65,8 @@ def create_figure2(rfe_dictionary, oca_method, bca_method, df):
     function to create figure 3 of the paper
 '''
 def create_figure3(rfe_dictionary, oca_method, df):
+    module_path = dirname(__file__)
+    filename = join(module_path,'..', 'output', 'Plot')
     features_nb = df.shape[1]
     features_oca = oca_method.selected_features
     scores_oca = oca_method.list_score
@@ -81,5 +89,5 @@ def create_figure3(rfe_dictionary, oca_method, df):
            title='RFE vs OCA')
     ax.grid()
     plt.legend()
-#    plt.savefig('RFE_vs_OCA.png')
+    plt.savefig(filename+'\\RFE_vs_OCA.png')
     plt.show()
