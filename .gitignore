@@ -1,3 +1,16 @@
 #ignore files
 __pycache__/
 temp/
+*.aux
+*.bbl
+*.blg
+*.log
+*.maf
+*.mtc
+*.mtc0
+*.out
+*.pdf
+*.spl
+*.synctex.gz
+/outptut/
+
